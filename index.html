@@ -1,108 +1,216 @@
-#machineControlsOuterContainer {
-    position: relative;
-    overflow: hidden;
-}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Machine Controls (toggle panel)</title>
 
-#machineControlsContainer {
-    position: absolute;
-    height: 100%;
-    z-index: 100;
-    width: 150px;
-    right: -120px;
-}
+  <style>
+    /* Basic layout & visuals */
+    /* Outer container preserves flow and hides overflow */
+    #machineControlsOuterContainer {
+      position: relative;
+      overflow: hidden;
+      height: 100vh; /* example height so the demo is visible */
+      background: #f7f7f7;
+    }
 
-#machineControlsThumb {
-    width: 30px;
-    height: 60px;
-    font-family: sans-serif;
-    font-size: 12pt;
-    border: 1px solid;
-    background-color: lightblue;
-    -ms-opacity: 0.25;
-    opacity: 0.25;
-    margin: auto;
-    position: absolute;
-    left: 0px;
-    top: 50%;
-}
+    /* The sliding container that we animate using `right` */
+    #machineControlsContainer {
+      position: absolute;
+      height: 100%;
+      z-index: 100;
+      width: 150px;     /* panel width */
+      right: 0;         /* initial, will be set by script to "closed" position */
+      top: 0;
+      box-sizing: border-box;
+    }
 
-#machineControlsRotatedContainer {
-    -webkit-transform: rotate(-90deg);
-    -moz-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    transform: rotate(-90deg);
-    margin: auto;
-    padding: 0;
-    line-height: 30px;
-}
+    /* Tray that holds the table of buttons */
+    #machineControlsTray {
+      position: absolute;
+      right: 0;
+      height: 100%;
+    }
 
-#machineControlsTray {
-    position: absolute;
-    right: -120px;
-    height: 100%;
-}
+    /* Visuals for the panel */
+    #machineControls {
+      background-color: lightblue;
+      opacity: 0.85;
+      width: 120px;
+      font-family: sans-serif;
+      font-size: 12pt;
+      text-align: left;
+      border: 1px solid rgba(0,0,0,0.2);
+      margin: 0;
+      padding: 8px;
+      box-sizing: border-box;
+      height: 100%;
+    }
 
-#machineControlsThumbText {
-}
+    /* Thumb that sticks out and is clickable */
+    #machineControlsThumb {
+      width: 30px;
+      height: 60px;
+      font-family: sans-serif;
+      font-size: 12pt;
+      border: 1px solid rgba(0,0,0,0.2);
+      background-color: lightblue;
+      opacity: 0.6;
+      margin: 0;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%); /* vertically center the thumb */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-#machineControls {
-    background-color: lightblue;
-    -ms-opacity: 0.5;
-    opacity: 0.5;
-    width: 120px;
-    font-family: sans-serif;
-    font-size: 12pt;
-    text-align: left;
-    border: 1px solid;
-}
+    /* Rotated content inside thumb */
+    #machineControlsRotatedContainer {
+      transform: rotate(-90deg);
+      margin: auto;
+      padding: 0;
+      line-height: 30px;
+      pointer-events: none; /* let the parent thumb handle clicks */
+    }
 
-.machineButton {
-    border: 1px solid;
-    padding: 0px;
-    margin: 0px;
-}
+    /* Small style adjustments */
+    .machineButton {
+      border: 1px solid rgba(0,0,0,0.15);
+      padding: 6px 8px;
+      margin: 6px 0;
+      background: rgba(255,255,255,0.6);
+      cursor: pointer;
+      text-align: center;
+    }
 
+    /* Make the thumb look interactive on hover/focus */
+    #machineControlsThumb:hover,
+    #machineControlsThumb:focus {
+      opacity: 0.95;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.12);
+    }
 
-
-<div id="machineControlsOuterContainer">
+    /* Ensure the table doesn't produce unexpected spacing */
+    #machineControls table, #machineControls tbody {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+<body>
+  <div id="machineControlsOuterContainer">
     <div id="machineControlsContainer">
-        <div id="machineControlsTray">
-            <table id="machineControls">
-                <tr>
-                    <td class="machineButton">Button</td>
-                </tr>
-                <tr>
-                    <td>Button</td>
-                </tr>
-                <tr>
-                    <td>Button</td>
-                </tr>
-                <tr>
-                    <td>Button</td>
-                </tr>
-                <tr>
-                    <td>Button</td>
-                </tr>
-            </table>
+      <div id="machineControlsTray">
+        <table id="machineControls" aria-label="Machine controls">
+          <tbody>
+            <tr><td class="machineButton" role="button" tabindex="0">Button 1</td></tr>
+            <tr><td class="machineButton" role="button" tabindex="0">Button 2</td></tr>
+            <tr><td class="machineButton" role="button" tabindex="0">Button 3</td></tr>
+            <tr><td class="machineButton" role="button" tabindex="0">Button 4</td></tr>
+            <tr><td class="machineButton" role="button" tabindex="0">Button 5</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Thumb: role=button for accessibility; keyboard support added in script -->
+      <div id="machineControlsThumb" aria-controls="machineControlsContainer" aria-expanded="false" tabindex="0" title="Open controls">
+        <div id="machineControlsRotatedContainer">
+          <div id="machineControlsThumbText">&bull;&bull;&bull;</div>
         </div>
-        <div id="machineControlsThumb">
-            <div id="machineControlsRotatedContainer">
-                <div id="machineControlsThumbText">&bull;&bull;&bull;</div>
-            </div>
-        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-$("#machineControlsThumb").click(function () {
-    var element = $("#machineControlsContainer");
-    var windowWidth = $(window).width();
-    var currentLeft = element.offset().left;
-    var currentRight = -150 + (windowWidth - currentLeft);
-    var newRight = -(currentRight + 120);
-    element.animate({
-        right: newRight
-    }, 200, function () {
+  <!-- jQuery for the animation/toggle (keeps the original behaviour simple) -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-o88Awf4gkQ2T+v2Q0p2k2d2Q2g2z9b6Y+4Qk2x7r2mM=" crossorigin="anonymous"></script>
 
+  <script>
+    /* jQuery toggle for the right-positioned sliding panel
+       - Toggles between "closed" (only thumb visible) and "open" (panel fully shown)
+       - Supports click and keyboard activation (Enter/Space)
+       - Recalculates closed position on resize to keep thumb visible even if widths change
+    */
+
+    $(function () {
+      var $container = $('#machineControlsContainer');
+      var $thumb = $('#machineControlsThumb');
+
+      // Utility to compute closedRight such that only the thumb remains visible
+      function computeClosedRight() {
+        var containerWidth = $container.outerWidth();
+        var thumbWidth = $thumb.outerWidth();
+        // We place the container so that (containerWidth - thumbWidth) is outside the viewport.
+        return -(containerWidth - thumbWidth);
+      }
+
+      // Initial state
+      var closedRight = computeClosedRight();
+      var openRight = 0;
+
+      // Ensure initial CSS matches computed closed position and mark as closed
+      $container.css('right', closedRight + 'px').data('open', false);
+      $thumb.attr({ 'role': 'button', 'tabindex': 0, 'aria-expanded': 'false' });
+
+      function setState(isOpen) {
+        $container.data('open', !!isOpen);
+        $thumb.attr('aria-expanded', isOpen ? 'true' : 'false');
+        // Update title for assistive users
+        $thumb.prop('title', isOpen ? 'Close controls' : 'Open controls');
+      }
+
+      // Toggle handler (click or keyboard)
+      function togglePanel(e) {
+        if (e.type === 'keydown') {
+          // Accept Enter and Space keys
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+          e.preventDefault();
+        }
+
+        // Recompute sizes in case layout changed
+        closedRight = computeClosedRight();
+
+        var isCurrentlyOpen = $container.data('open');
+        var targetRight = isCurrentlyOpen ? closedRight : openRight;
+
+        // Stop any running animation and animate to target position
+        $container.stop(true, true).animate({ right: targetRight }, 200, function () {
+          setState(!isCurrentlyOpen);
+        });
+      }
+
+      $thumb.on('click', togglePanel);
+      $thumb.on('keydown', togglePanel);
+
+      // If the window resizes, recompute closed offset and keep the current state
+      $(window).on('resize', function () {
+        closedRight = computeClosedRight();
+        var isOpen = $container.data('open');
+        $container.css('right', (isOpen ? openRight : closedRight) + 'px');
+      });
+
+      // Basic keyboard activation of the control buttons inside the panel
+      $('#machineControls').on('keydown', '.machineButton', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          $(this).trigger('click');
+        }
+      });
+
+      // Example handlers for the buttons (replace with real actions)
+      $('#machineControls').on('click', '.machineButton', function () {
+        var txt = $(this).text();
+        // In a real app do something meaningful here. We'll show a quick visual cue:
+        $(this).fadeOut(80).fadeIn(160);
+        console.log('Clicked control:', txt);
+      });
     });
-});
+  </script>
+</body>
+</html>
