@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Physics Dots</title>
+  <title>Physics Dots with Collisions</title>
   <style>
     body, html {
       margin: 0;
@@ -29,7 +29,7 @@ class Dot {
     this.y = y;
     this.vx = 0;
     this.vy = 0;
-    this.radius = 5;
+    this.radius = 8;
     this.mass = 1;
     this.fixed = false;
   }
@@ -42,9 +42,9 @@ class Dot {
 
   update() {
     if (this.fixed) return;
-    this.vy += 0.1; // gravity
-    this.vx *= 0.99; // damping
-    this.vy *= 0.99;
+    this.vy += 0.2; // gravity
+    this.vx *= 0.98; // damping
+    this.vy *= 0.98;
     this.x += this.vx;
     this.y += this.vy;
   }
@@ -54,6 +54,42 @@ class Dot {
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fillStyle = "#0ff";
     ctx.fill();
+  }
+
+  checkCollision(other) {
+    const dx = other.x - this.x;
+    const dy = other.y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const minDist = this.radius + other.radius;
+    if (dist < minDist && dist > 0) {
+      const overlap = minDist - dist;
+      const nx = dx / dist;
+      const ny = dy / dist;
+
+      if (!this.fixed) {
+        this.x -= nx * overlap / 2;
+        this.y -= ny * overlap / 2;
+      }
+      if (!other.fixed) {
+        other.x += nx * overlap / 2;
+        other.y += ny * overlap / 2;
+      }
+
+      // Simple elastic response
+      const dvx = other.vx - this.vx;
+      const dvy = other.vy - this.vy;
+      const impact = dvx * nx + dvy * ny;
+      const impulse = impact * 0.5;
+
+      if (!this.fixed) {
+        this.vx += impulse * nx;
+        this.vy += impulse * ny;
+      }
+      if (!other.fixed) {
+        other.vx -= impulse * nx;
+        other.vy -= impulse * ny;
+      }
+    }
   }
 }
 
@@ -89,19 +125,17 @@ class Spring {
 const dots = [];
 const springs = [];
 
-// Create a grid of dots
 const cols = 10;
 const rows = 10;
 const spacing = 40;
 for (let y = 0; y < rows; y++) {
   for (let x = 0; x < cols; x++) {
     const dot = new Dot(100 + x * spacing, 100 + y * spacing);
-    if (y === 0) dot.fixed = true; // top row fixed
+    if (y === 0) dot.fixed = true;
     dots.push(dot);
   }
 }
 
-// Connect dots with springs
 for (let y = 0; y < rows; y++) {
   for (let x = 0; x < cols; x++) {
     const i = y * cols + x;
@@ -114,39 +148,44 @@ for (let y = 0; y < rows; y++) {
   }
 }
 
-let selectedDot = null;
+let mouseDown = false;
+let lastMouse = { x: 0, y: 0 };
 
 canvas.addEventListener('mousedown', e => {
-  const mx = e.clientX;
-  const my = e.clientY;
-  for (const dot of dots) {
-    const dx = dot.x - mx;
-    const dy = dot.y - my;
-    if (dx * dx + dy * dy < dot.radius * dot.radius * 4) {
-      selectedDot = dot;
-      dot.fixed = true;
-      break;
-    }
-  }
+  mouseDown = true;
+  lastMouse.x = e.clientX;
+  lastMouse.y = e.clientY;
 });
 
 canvas.addEventListener('mousemove', e => {
-  if (selectedDot) {
-    selectedDot.x = e.clientX;
-    selectedDot.y = e.clientY;
+  if (mouseDown) {
+    const dx = e.clientX - lastMouse.x;
+    const dy = e.clientY - lastMouse.y;
+    for (const dot of dots) {
+      const dist = Math.hypot(dot.x - e.clientX, dot.y - e.clientY);
+      if (dist < 100) {
+        const force = (100 - dist) * 0.05;
+        const angle = Math.atan2(dot.y - e.clientY, dot.x - e.clientX);
+        dot.applyForce(Math.cos(angle) * force, Math.sin(angle) * force);
+      }
+    }
+    lastMouse.x = e.clientX;
+    lastMouse.y = e.clientY;
   }
 });
 
 canvas.addEventListener('mouseup', () => {
-  if (selectedDot) {
-    selectedDot.fixed = false;
-    selectedDot = null;
-  }
+  mouseDown = false;
 });
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (const spring of springs) spring.update();
+  for (let i = 0; i < dots.length; i++) {
+    for (let j = i + 1; j < dots.length; j++) {
+      dots[i].checkCollision(dots[j]);
+    }
+  }
   for (const dot of dots) dot.update();
   for (const spring of springs) spring.draw();
   for (const dot of dots) dot.draw();
