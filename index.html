@@ -1,216 +1,159 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Machine Controls (toggle panel)</title>
-
+  <meta charset="UTF-8">
+  <title>Physics Dots</title>
   <style>
-    /* Basic layout & visuals */
-    /* Outer container preserves flow and hides overflow */
-    #machineControlsOuterContainer {
-      position: relative;
-      overflow: hidden;
-      height: 100vh; /* example height so the demo is visible */
-      background: #f7f7f7;
-    }
-
-    /* The sliding container that we animate using `right` */
-    #machineControlsContainer {
-      position: absolute;
-      height: 100%;
-      z-index: 100;
-      width: 150px;     /* panel width */
-      right: 0;         /* initial, will be set by script to "closed" position */
-      top: 0;
-      box-sizing: border-box;
-    }
-
-    /* Tray that holds the table of buttons */
-    #machineControlsTray {
-      position: absolute;
-      right: 0;
-      height: 100%;
-    }
-
-    /* Visuals for the panel */
-    #machineControls {
-      background-color: lightblue;
-      opacity: 0.85;
-      width: 120px;
-      font-family: sans-serif;
-      font-size: 12pt;
-      text-align: left;
-      border: 1px solid rgba(0,0,0,0.2);
+    body, html {
       margin: 0;
-      padding: 8px;
-      box-sizing: border-box;
-      height: 100%;
-    }
-
-    /* Thumb that sticks out and is clickable */
-    #machineControlsThumb {
-      width: 30px;
-      height: 60px;
-      font-family: sans-serif;
-      font-size: 12pt;
-      border: 1px solid rgba(0,0,0,0.2);
-      background-color: lightblue;
-      opacity: 0.6;
-      margin: 0;
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%); /* vertically center the thumb */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* Rotated content inside thumb */
-    #machineControlsRotatedContainer {
-      transform: rotate(-90deg);
-      margin: auto;
       padding: 0;
-      line-height: 30px;
-      pointer-events: none; /* let the parent thumb handle clicks */
+      overflow: hidden;
+      background: #111;
     }
-
-    /* Small style adjustments */
-    .machineButton {
-      border: 1px solid rgba(0,0,0,0.15);
-      padding: 6px 8px;
-      margin: 6px 0;
-      background: rgba(255,255,255,0.6);
-      cursor: pointer;
-      text-align: center;
-    }
-
-    /* Make the thumb look interactive on hover/focus */
-    #machineControlsThumb:hover,
-    #machineControlsThumb:focus {
-      opacity: 0.95;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.12);
-    }
-
-    /* Ensure the table doesn't produce unexpected spacing */
-    #machineControls table, #machineControls tbody {
-      width: 100%;
-      border-collapse: collapse;
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div id="machineControlsOuterContainer">
-    <div id="machineControlsContainer">
-      <div id="machineControlsTray">
-        <table id="machineControls" aria-label="Machine controls">
-          <tbody>
-            <tr><td class="machineButton" role="button" tabindex="0">Button 1</td></tr>
-            <tr><td class="machineButton" role="button" tabindex="0">Button 2</td></tr>
-            <tr><td class="machineButton" role="button" tabindex="0">Button 3</td></tr>
-            <tr><td class="machineButton" role="button" tabindex="0">Button 4</td></tr>
-            <tr><td class="machineButton" role="button" tabindex="0">Button 5</td></tr>
-          </tbody>
-        </table>
-      </div>
+<canvas id="canvas"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-      <!-- Thumb: role=button for accessibility; keyboard support added in script -->
-      <div id="machineControlsThumb" aria-controls="machineControlsContainer" aria-expanded="false" tabindex="0" title="Open controls">
-        <div id="machineControlsRotatedContainer">
-          <div id="machineControlsThumbText">&bull;&bull;&bull;</div>
-        </div>
-      </div>
-    </div>
-  </div>
+class Dot {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = 0;
+    this.vy = 0;
+    this.radius = 5;
+    this.mass = 1;
+    this.fixed = false;
+  }
 
-  <!-- jQuery for the animation/toggle (keeps the original behaviour simple) -->
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-o88Awf4gkQ2T+v2Q0p2k2d2Q2g2z9b6Y+4Qk2x7r2mM=" crossorigin="anonymous"></script>
+  applyForce(fx, fy) {
+    if (this.fixed) return;
+    this.vx += fx / this.mass;
+    this.vy += fy / this.mass;
+  }
 
-  <script>
-    /* jQuery toggle for the right-positioned sliding panel
-       - Toggles between "closed" (only thumb visible) and "open" (panel fully shown)
-       - Supports click and keyboard activation (Enter/Space)
-       - Recalculates closed position on resize to keep thumb visible even if widths change
-    */
+  update() {
+    if (this.fixed) return;
+    this.vy += 0.1; // gravity
+    this.vx *= 0.99; // damping
+    this.vy *= 0.99;
+    this.x += this.vx;
+    this.y += this.vy;
+  }
 
-    $(function () {
-      var $container = $('#machineControlsContainer');
-      var $thumb = $('#machineControlsThumb');
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "#0ff";
+    ctx.fill();
+  }
+}
 
-      // Utility to compute closedRight such that only the thumb remains visible
-      function computeClosedRight() {
-        var containerWidth = $container.outerWidth();
-        var thumbWidth = $thumb.outerWidth();
-        // We place the container so that (containerWidth - thumbWidth) is outside the viewport.
-        return -(containerWidth - thumbWidth);
-      }
+class Spring {
+  constructor(a, b, length) {
+    this.a = a;
+    this.b = b;
+    this.length = length;
+    this.k = 0.1;
+  }
 
-      // Initial state
-      var closedRight = computeClosedRight();
-      var openRight = 0;
+  update() {
+    const dx = this.b.x - this.a.x;
+    const dy = this.b.y - this.a.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const force = this.k * (dist - this.length);
+    const fx = (dx / dist) * force;
+    const fy = (dy / dist) * force;
 
-      // Ensure initial CSS matches computed closed position and mark as closed
-      $container.css('right', closedRight + 'px').data('open', false);
-      $thumb.attr({ 'role': 'button', 'tabindex': 0, 'aria-expanded': 'false' });
+    this.a.applyForce(fx, fy);
+    this.b.applyForce(-fx, -fy);
+  }
 
-      function setState(isOpen) {
-        $container.data('open', !!isOpen);
-        $thumb.attr('aria-expanded', isOpen ? 'true' : 'false');
-        // Update title for assistive users
-        $thumb.prop('title', isOpen ? 'Close controls' : 'Open controls');
-      }
+  draw() {
+    ctx.beginPath();
+    ctx.moveTo(this.a.x, this.a.y);
+    ctx.lineTo(this.b.x, this.b.y);
+    ctx.strokeStyle = "#888";
+    ctx.stroke();
+  }
+}
 
-      // Toggle handler (click or keyboard)
-      function togglePanel(e) {
-        if (e.type === 'keydown') {
-          // Accept Enter and Space keys
-          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
-          e.preventDefault();
-        }
+const dots = [];
+const springs = [];
 
-        // Recompute sizes in case layout changed
-        closedRight = computeClosedRight();
+// Create a grid of dots
+const cols = 10;
+const rows = 10;
+const spacing = 40;
+for (let y = 0; y < rows; y++) {
+  for (let x = 0; x < cols; x++) {
+    const dot = new Dot(100 + x * spacing, 100 + y * spacing);
+    if (y === 0) dot.fixed = true; // top row fixed
+    dots.push(dot);
+  }
+}
 
-        var isCurrentlyOpen = $container.data('open');
-        var targetRight = isCurrentlyOpen ? closedRight : openRight;
+// Connect dots with springs
+for (let y = 0; y < rows; y++) {
+  for (let x = 0; x < cols; x++) {
+    const i = y * cols + x;
+    if (x < cols - 1) {
+      springs.push(new Spring(dots[i], dots[i + 1], spacing));
+    }
+    if (y < rows - 1) {
+      springs.push(new Spring(dots[i], dots[i + cols], spacing));
+    }
+  }
+}
 
-        // Stop any running animation and animate to target position
-        $container.stop(true, true).animate({ right: targetRight }, 200, function () {
-          setState(!isCurrentlyOpen);
-        });
-      }
+let selectedDot = null;
 
-      $thumb.on('click', togglePanel);
-      $thumb.on('keydown', togglePanel);
+canvas.addEventListener('mousedown', e => {
+  const mx = e.clientX;
+  const my = e.clientY;
+  for (const dot of dots) {
+    const dx = dot.x - mx;
+    const dy = dot.y - my;
+    if (dx * dx + dy * dy < dot.radius * dot.radius * 4) {
+      selectedDot = dot;
+      dot.fixed = true;
+      break;
+    }
+  }
+});
 
-      // If the window resizes, recompute closed offset and keep the current state
-      $(window).on('resize', function () {
-        closedRight = computeClosedRight();
-        var isOpen = $container.data('open');
-        $container.css('right', (isOpen ? openRight : closedRight) + 'px');
-      });
+canvas.addEventListener('mousemove', e => {
+  if (selectedDot) {
+    selectedDot.x = e.clientX;
+    selectedDot.y = e.clientY;
+  }
+});
 
-      // Basic keyboard activation of the control buttons inside the panel
-      $('#machineControls').on('keydown', '.machineButton', function (ev) {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          $(this).trigger('click');
-        }
-      });
+canvas.addEventListener('mouseup', () => {
+  if (selectedDot) {
+    selectedDot.fixed = false;
+    selectedDot = null;
+  }
+});
 
-      // Example handlers for the buttons (replace with real actions)
-      $('#machineControls').on('click', '.machineButton', function () {
-        var txt = $(this).text();
-        // In a real app do something meaningful here. We'll show a quick visual cue:
-        $(this).fadeOut(80).fadeIn(160);
-        console.log('Clicked control:', txt);
-      });
-    });
-  </script>
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (const spring of springs) spring.update();
+  for (const dot of dots) dot.update();
+  for (const spring of springs) spring.draw();
+  for (const dot of dots) dot.draw();
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
 </body>
 </html>
