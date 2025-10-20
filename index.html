@@ -1,15 +1,440 @@
-noBtn.addEventListener("mouseover", () => {
- const newX = Math.floor(Math.random() * questionContainer.offsetWidth);
- const newY = Math.floor(Math.random() * questionContainer.offsetWidth);
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Do you love me? — Meow meow</title>
+  <meta name="theme-color" content="#ffd9e6" />
+  <style>
+    /* =========================
+       Super Cute Apple-level UI
+       ========================= */
 
-  noBtn.style.left = `${newX}px`;
- noBtn.style.top = `${newY}px`;
-});
+    /* Design tokens */
+    :root{
+      --bg-1: #fff1f6;         /* cotton candy */
+      --bg-2: #f6f7ff;         /* pearl lavender */
+      --bg-3: #f0fff7;         /* mint whisper */
+      --ink: #1f1f1f;          /* primary text */
+      --ink-soft: #4b4b4b;     /* secondary */
+      --accent: #ff6b9a;       /* strawberry milk */
+      --accent-600:#ff4d86;
+      --accent-700:#ff3a79;
+      --accent-300:#ffa5c3;
+      --lilac: #a08bff;        /* cute lilac */
+      --lilac-600:#8e77ff;
+      --cream: #fff8fb;        /* card base */
+      --border: rgba(255, 128, 171, 0.26);
+      --ring: rgba(255, 107, 154, 0.5);
 
-yesBtn.addEventListener("click", () => {
- const timeoutId = setTimeout(() => {
- heartLoader.style.display = "none";
- resultContainer.style.display = "inherit";
- gifResult.play();
- }, 3000);
-});
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --blur: 18px;
+
+      --shadow-1:
+        0 1px 0 rgba(255,255,255,0.8) inset,
+        0 10px 30px rgba(255, 107, 154, 0.12),
+        0 6px 14px rgba(160, 139, 255, 0.10);
+      --shadow-2:
+        0 2px 0 rgba(255,255,255,0.9) inset,
+        0 14px 40px rgba(255, 107, 154, 0.18),
+        0 10px 24px rgba(160, 139, 255, 0.16);
+    }
+
+    /* Base reset */
+    *{ box-sizing: border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-rounded, "SF Pro Rounded", "SF Pro Text", -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 1200px at 10% -10%, var(--bg-1) 0%, transparent 60%),
+        radial-gradient(1100px 900px at 110% 0%, var(--bg-2) 0%, transparent 60%),
+        radial-gradient(1000px 1000px at 50% 120%, var(--bg-3) 0%, transparent 60%),
+        linear-gradient(180deg, #fff, #fff);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Subtle animated shimmer on the background for delight */
+    body::before{
+      content:"";
+      position:fixed; inset:-20% -20%;
+      pointer-events:none;
+      background:
+        radial-gradient(120px 120px at 20% 30%, rgba(255,107,154,.10), transparent 60%),
+        radial-gradient(180px 180px at 80% 60%, rgba(160,139,255,.12), transparent 60%);
+      filter: blur(30px);
+      animation: floatGlow 18s ease-in-out infinite alternate;
+    }
+    @keyframes floatGlow {
+      0% { transform: translate3d(0,0,0) scale(1); opacity:.75;}
+      100%{ transform: translate3d(2rem,-1.5rem,0) scale(1.05); opacity:.95;}
+    }
+
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding: 28px 20px;
+    }
+
+    .card{
+      position:relative;
+      width:min(720px, 92vw);
+      border-radius: var(--radius-xl);
+      background: color-mix(in oklab, var(--cream) 78%, white);
+      backdrop-filter: blur(var(--blur)) saturate(1.1);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(1.1);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-1);
+      overflow: hidden;
+    }
+
+    /* Decorative floating hearts */
+    .card::before,
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(10px 10px at 12% 22%, rgba(255,107,154,.20) 0 50%, transparent 52%) no-repeat,
+        radial-gradient(10px 10px at 22% 18%, rgba(255,107,154,.20) 0 50%, transparent 52%) no-repeat,
+        radial-gradient(10px 10px at 82% 72%, rgba(160,139,255,.20) 0 50%, transparent 52%) no-repeat,
+        radial-gradient(10px 10px at 72% 78%, rgba(160,139,255,.20) 0 50%, transparent 52%) no-repeat;
+      opacity:.45;
+      pointer-events:none;
+      transform: translateY(0);
+      animation: heartsDrift 14s ease-in-out infinite;
+    }
+    .card::after{
+      animation-duration: 20s;
+      animation-delay: -4s;
+      opacity:.35;
+    }
+    @keyframes heartsDrift {
+      0% { transform: translateY(0); }
+      50%{ transform: translateY(-8px); }
+      100%{ transform: translateY(0); }
+    }
+
+    .inner{
+      position:relative;
+      padding: clamp(22px, 3.8vw, 34px);
+      z-index: 1;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:.5ch;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fff, #fff5fa);
+      border: 1px solid rgba(255,107,154,.22);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 8px 20px rgba(255,107,154,.12);
+      width:max-content;
+    }
+
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(28px, 4.8vw, 44px);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+    .meow{
+      font-size: clamp(14px, 2.6vw, 18px);
+      color: var(--ink-soft);
+      margin: 0 0 10px;
+    }
+
+    .letter{
+      margin: 16px 0 8px;
+      font-size: clamp(16px, 2.7vw, 18px);
+      line-height: 1.6;
+      color: #2b2b2b;
+      background: linear-gradient(180deg, #fff, #fff9fc);
+      padding: clamp(14px, 2.2vw, 18px) clamp(16px, 2.6vw, 22px);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,107,154,.14);
+      box-shadow: var(--shadow-1);
+    }
+
+    .play-area{
+      position: relative;
+      margin-top: clamp(18px, 3.2vw, 28px);
+      height: clamp(240px, 38vw, 320px);
+      min-height: 240px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, #fffefc, #fff7fb);
+      border: 1px solid rgba(160,139,255,.18);
+      box-shadow: var(--shadow-1);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Subtle pattern */
+    .play-area::before{
+      content:"";
+      position:absolute; inset:0;
+      background-image:
+        radial-gradient(circle at 16px 16px, rgba(255,107,154,.12) 2px, transparent 2.5px),
+        radial-gradient(circle at 48px 48px, rgba(160,139,255,.12) 2px, transparent 2.5px);
+      background-size: 64px 64px;
+      opacity:.5;
+      pointer-events:none;
+    }
+
+    .prompt{
+      position:absolute;
+      top: 22px; left: 22px; right: 22px;
+      display:flex; align-items:center; gap:10px;
+      color: var(--ink-soft);
+      font-size: 15px;
+    }
+    .prompt .cat{
+      font-size: 22px; filter: drop-shadow(0 1px 0 #fff);
+    }
+
+    /* Button styles */
+    .btn{
+      --bg: #fff;
+      --bg2:#fff8fb;
+      --fg: var(--ink);
+      --shadow: var(--shadow-1);
+      appearance:none;
+      border:1px solid rgba(0,0,0,0.04);
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--bg), var(--bg2));
+      color: var(--fg);
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: .01em;
+      padding: 13px 20px;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform .12s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, filter .2s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active{ transform: translateY(1px) scale(.98); }
+    .btn:focus-visible{
+      outline:none;
+      box-shadow: var(--shadow-2), 0 0 0 6px var(--ring);
+    }
+
+    .btn-primary{
+      --bg: color-mix(in oklab, white 86%, var(--accent) 14%);
+      --bg2: color-mix(in oklab, white 82%, var(--accent) 18%);
+      --fg: #7a0f35;
+      border-color: rgba(255,107,154,.34);
+    }
+    .btn-primary:hover{
+      filter: brightness(1.03);
+      box-shadow: var(--shadow-2);
+    }
+
+    .btn-ghost{
+      --bg: color-mix(in oklab, white 92%, var(--lilac) 8%);
+      --bg2: color-mix(in oklab, white 88%, var(--lilac) 12%);
+      --fg: #3a2b80;
+      border-color: rgba(160,139,255,.30);
+    }
+    .btn-ghost:hover{
+      filter: brightness(1.02);
+      box-shadow: var(--shadow-2);
+    }
+
+    /* Layout within play-area */
+    .yes-wrap{
+      position:absolute;
+      left:50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      display:flex; align-items:center; gap:10px;
+    }
+
+    #noBtn{
+      position:absolute;
+      top: 70px;
+      left: 24px;
+      transform: translate3d(0,0,0);
+      transition: transform .22s cubic-bezier(.2,.7,.2,1), filter .2s ease;
+      z-index: 2;
+    }
+
+    /* Celebration hearts */
+    .celebrate{
+      position:absolute; inset:0;
+      display:none;
+      pointer-events:none;
+      overflow:hidden;
+      z-index: 5;
+    }
+    .celebrate.active{ display:block; }
+    .heart{
+      position:absolute;
+      top: 100%;
+      font-size: var(--size, 16px);
+      color: var(--color, #ff6b9a);
+      opacity: .0;
+      transform: translate(-50%, 0) scale(.9) rotate(var(--rot, 0deg));
+      text-shadow: 0 4px 10px rgba(255,107,154,.22), 0 1px 0 #fff;
+      animation: floatUp var(--dur, 2200ms) ease-in forwards;
+      animation-delay: var(--delay, 0ms);
+    }
+    @keyframes floatUp {
+      10% { opacity: .95; }
+      100%{
+        transform: translate(-50%, -120vh) scale(1.1) rotate(var(--rot, 0deg));
+        opacity: 0;
+      }
+    }
+
+    /* Tiny helper text */
+    .tiny{
+      margin-top: 12px;
+      font-size: 12px;
+      color: #6b6b6b;
+      text-align: center;
+    }
+
+    @media (max-width: 380px){
+      .yes-wrap{ bottom: 16px; }
+      #noBtn{ top: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card" role="region" aria-label="Love letter">
+      <div class="inner">
+        <span class="badge" aria-hidden="true">Meow meow</span>
+        <h1>Do you love me? <span aria-hidden="true">💘</span></h1>
+        <p class="meow">I made this tiny letter just for you — soft, sparkly, and full of purrs.</p>
+
+        <div class="letter" aria-live="polite">
+          Dear my favorite human,<br/>
+          Every time I think of you, my heart does a little twirl like a ribbon in the wind.
+          So I have to ask, with the softest paws and the warmest smile…
+          will you be my forever yes? Meow meow. ✨
+        </div>
+
+        <div class="play-area" id="playArea" aria-describedby="promptText">
+          <div class="prompt" id="promptText">
+            <span class="cat" aria-hidden="true">😺</span>
+            Tap “Yes” to make my heart sparkle. Try catching “No” if you can…
+          </div>
+
+          <button id="noBtn" class="btn btn-ghost" aria-label="No (this one runs away)">
+            <span aria-hidden="true">🙀</span> No
+          </button>
+
+          <div class="yes-wrap">
+            <button id="yesBtn" class="btn btn-primary">
+              <span aria-hidden="true">💖</span> Yes
+            </button>
+          </div>
+
+          <div class="celebrate" id="celebrate" aria-hidden="true"></div>
+        </div>
+
+        <div class="tiny">P.S. If the “No” runs away, that’s fate helping a little. 💞</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Elements
+    const playArea = document.getElementById('playArea');
+    const yesBtn   = document.getElementById('yesBtn');
+    const noBtn    = document.getElementById('noBtn');
+    const celebrate= document.getElementById('celebrate');
+
+    // Utility to get a safe random position within play area
+    function randomPosition(btn, container){
+      const pad = 8;
+      const maxX = Math.max(0, container.clientWidth  - btn.offsetWidth  - pad*2);
+      const maxY = Math.max(0, container.clientHeight - btn.offsetHeight - pad*2);
+      const x = pad + Math.random() * (maxX || 0);
+      const y = pad + Math.random() * (maxY || 0);
+      return { x, y };
+    }
+
+    // Make "No" run away on hover/touch
+    function moveNo(){
+      const { x, y } = randomPosition(noBtn, playArea);
+      noBtn.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    }
+
+    // Trigger movement on various pointer interactions
+    ['mouseenter','mouseover','pointerenter','pointerover','touchstart'].forEach(ev=>{
+      noBtn.addEventListener(ev, moveNo, { passive:true });
+    });
+
+    // Also nudge it occasionally so it feels alive
+    let roamTimer = setInterval(()=>{
+      // Move only if pointer isn't already hovering (cheap check)
+      if (!noBtn.matches(':hover')) moveNo();
+    }, 3500);
+
+    // Celebration hearts when "Yes" is clicked
+    function popHearts(){
+      celebrate.innerHTML = '';
+      celebrate.classList.add('active');
+
+      const colors = ['#ff6b9a', '#ff8fb3', '#a08bff', '#ffc0d9', '#ff7fa8'];
+      const count = 28;
+      for(let i=0;i<count;i++){
+        const span = document.createElement('span');
+        span.className = 'heart';
+        span.textContent = Math.random() < .15 ? '💗' : '❤';
+        // randomize properties via CSS variables
+        const left = 8 + Math.random()*84; // percentage
+        const size = 14 + Math.random()*20; // px
+        const delay = Math.random()*600; // ms
+        const dur = 1800 + Math.random()*1400; // ms
+        const rot = (Math.random()*60 - 30) + 'deg';
+        const color = colors[(Math.random()*colors.length)|0];
+
+        span.style.left = left + '%';
+        span.style.setProperty('--size', size + 'px');
+        span.style.setProperty('--delay', delay + 'ms');
+        span.style.setProperty('--dur', dur + 'ms');
+        span.style.setProperty('--rot', rot);
+        span.style.setProperty('--color', color);
+        celebrate.appendChild(span);
+      }
+
+      // Hide celebration layer after animation
+      setTimeout(()=> celebrate.classList.remove('active'), 2600);
+    }
+
+    yesBtn.addEventListener('click', ()=>{
+      popHearts();
+      // Optional: sweet microcopy after click
+      const letter = document.querySelector('.letter');
+      letter.innerHTML = `Eee! You said <strong>YES</strong>! My heart is officially the happiest cupcake in the bakery. 
+      I promise to bring you warm hugs, silly jokes, and endless meow meows. 💞✨`;
+    });
+
+    // Keep "No" in bounds if window resizes
+    window.addEventListener('resize', ()=>{
+      // Recalculate by moving again (keeps it safe)
+      moveNo();
+    }, { passive:true });
+
+    // Initial playful nudge
+    requestAnimationFrame(moveNo);
+  </script>
+</body>
+</html>
