@@ -1,273 +1,176 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Do you love me? — Meow meow</title>
-  <meta name="theme-color" content="#ffd9e6"/>
+  <meta name="theme-color" content="#ffd9e6" />
   <style>
     /* =========================
        Super Cute Apple-level UI
        ========================= */
 
     /* Design tokens */
-    :root {
-      --bg-1: #fff1f6;          /* cotton candy */
-      --bg-2: #f6f7ff;          /* pearl lavender */
-      --bg-3: #f0fff7;          /* mint whisper */
-      --ink: #1a1a1a;           /* primary text */
-      --ink-soft: #5b5b5b;      /* secondary text */
-      --accent: #ff6b9a;        /* strawberry milk */
-      --accent-500:#ff6b9a;
+    :root{
+      --bg-1: #fff1f6;         /* cotton candy */
+      --bg-2: #f6f7ff;         /* pearl lavender */
+      --bg-3: #f0fff7;         /* mint whisper */
+      --ink: #1f1f1f;          /* primary text */
+      --ink-soft: #4b4b4b;     /* secondary */
+      --accent: #ff6b9a;       /* strawberry milk */
       --accent-600:#ff4d86;
       --accent-700:#ff3a79;
-      --accent-300:#ffa6c5;
-      --lilac: #a08bff;         /* cute lilac */
+      --accent-300:#ffa5c3;
+      --lilac: #a08bff;        /* cute lilac */
       --lilac-600:#8e77ff;
-      --mint: #66e3bc;          /* minty sparkle */
-      --cream: #fff8fb;         /* card base */
+      --cream: #fff8fb;        /* card base */
       --border: rgba(255, 128, 171, 0.26);
-      --ring: rgba(255, 107, 154, 0.50);
+      --ring: rgba(255, 107, 154, 0.5);
 
-      --radius-xl: 26px;
+      --radius-xl: 24px;
       --radius-lg: 16px;
-      --radius-md: 12px;
       --blur: 18px;
 
       --shadow-1:
-        0 1px 0 rgba(255,255,255,0.85) inset,
-        0 12px 30px rgba(255, 107, 154, 0.12),
-        0 8px 18px rgba(160, 139, 255, 0.10);
+        0 1px 0 rgba(255,255,255,0.8) inset,
+        0 10px 30px rgba(255, 107, 154, 0.12),
+        0 6px 14px rgba(160, 139, 255, 0.10);
       --shadow-2:
         0 2px 0 rgba(255,255,255,0.9) inset,
-        0 18px 42px rgba(255, 107, 154, 0.18),
-        0 12px 24px rgba(160, 139, 255, 0.16);
-      --glass: color-mix(in oklab, var(--cream) 78%, white);
+        0 14px 40px rgba(255, 107, 154, 0.18),
+        0 10px 24px rgba(160, 139, 255, 0.16);
     }
 
     /* Base reset */
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      color: var(--ink);
+    *{ box-sizing: border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
       font-family: ui-rounded, "SF Pro Rounded", "SF Pro Text", -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--ink);
       background:
-        radial-gradient(1200px 1200px at 12% -10%, var(--bg-1) 0%, transparent 60%),
-        radial-gradient(1100px 900px at 110% -10%, var(--bg-2) 0%, transparent 60%),
+        radial-gradient(1200px 1200px at 10% -10%, var(--bg-1) 0%, transparent 60%),
+        radial-gradient(1100px 900px at 110% 0%, var(--bg-2) 0%, transparent 60%),
         radial-gradient(1000px 1000px at 50% 120%, var(--bg-3) 0%, transparent 60%),
-        linear-gradient(#fff, #fff);
+        linear-gradient(180deg, #fff, #fff);
       background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
     }
 
-    /* Floating background sparkles */
-    .bg-sparkles {
-      position: fixed; inset: -15% -15%;
-      pointer-events: none;
+    /* Subtle animated shimmer on the background for delight */
+    body::before{
+      content:"";
+      position:fixed; inset:-20% -20%;
+      pointer-events:none;
       background:
-        radial-gradient(10px 10px at 18% 30%, rgba(255,107,154,.10) 0 50%, transparent 52%) no-repeat,
-        radial-gradient(12px 12px at 82% 68%, rgba(160,139,255,.12) 0 50%, transparent 52%) no-repeat,
-        radial-gradient(8px 8px at 40% 86%, rgba(102,227,188,.14) 0 50%, transparent 52%) no-repeat;
-      filter: blur(18px) saturate(1.1);
-      animation: floatGlow 20s ease-in-out infinite alternate;
-      z-index: 0;
+        radial-gradient(120px 120px at 20% 30%, rgba(255,107,154,.10), transparent 60%),
+        radial-gradient(180px 180px at 80% 60%, rgba(160,139,255,.12), transparent 60%);
+      filter: blur(30px);
+      animation: floatGlow 18s ease-in-out infinite alternate;
     }
     @keyframes floatGlow {
-      0% { transform: translate3d(0,0,0) scale(1); opacity:.85; }
-      100% { transform: translate3d(2.4rem,-1.6rem,0) scale(1.06); opacity:.98; }
+      0% { transform: translate3d(0,0,0) scale(1); opacity:.75;}
+      100%{ transform: translate3d(2rem,-1.5rem,0) scale(1.05); opacity:.95;}
     }
 
-    .wrap {
-      min-height: 100%;
-      display: grid;
-      place-items: center;
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
       padding: 28px 20px;
-      position: relative;
-      z-index: 1;
     }
 
-    /* Card */
-    .card {
-      position: relative;
-      width: min(840px, 94vw);
+    .card{
+      position:relative;
+      width:min(720px, 92vw);
       border-radius: var(--radius-xl);
-      background: var(--glass);
-      backdrop-filter: blur(var(--blur)) saturate(1.07);
-      -webkit-backdrop-filter: blur(var(--blur)) saturate(1.07);
+      background: color-mix(in oklab, var(--cream) 78%, white);
+      backdrop-filter: blur(var(--blur)) saturate(1.1);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(1.1);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-1);
       overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform .3s ease, box-shadow .3s ease;
-    }
-    .card:hover { box-shadow: var(--shadow-2); }
-    .card .shine {
-      content: "";
-      position: absolute; inset: -40% -40%;
-      background:
-        linear-gradient(115deg, rgba(255,255,255,.6), transparent 30% 70%, rgba(255,255,255,.35));
-      transform: translateX(-50%) rotate(8deg);
-      opacity: .25;
-      pointer-events: none;
-      animation: shimmer 8s linear infinite;
-    }
-    @keyframes shimmer {
-      0%   { transform: translateX(-55%) rotate(8deg); }
-      100% { transform: translateX(55%) rotate(8deg); }
     }
 
-    /* Decorative confetti hearts inside the card edges */
-    .card::before, .card::after {
-      content: "";
-      position: absolute; inset: 0;
+    /* Decorative floating hearts */
+    .card::before,
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
       background:
-        radial-gradient(8px 8px at 8% 12%, rgba(255,107,154,.16) 0 50%, transparent 52%) no-repeat,
-        radial-gradient(8px 8px at 14% 18%, rgba(255,107,154,.16) 0 50%, transparent 52%) no-repeat,
-        radial-gradient(8px 8px at 86% 84%, rgba(160,139,255,.16) 0 50%, transparent 52%) no-repeat,
-        radial-gradient(8px 8px at 80% 78%, rgba(160,139,255,.16) 0 50%, transparent 52%) no-repeat;
-      opacity: .45;
-      pointer-events: none;
-      animation: heartsDrift 16s ease-in-out infinite;
+        radial-gradient(10px 10px at 12% 22%, rgba(255,107,154,.20) 0 50%, transparent 52%) no-repeat,
+        radial-gradient(10px 10px at 22% 18%, rgba(255,107,154,.20) 0 50%, transparent 52%) no-repeat,
+        radial-gradient(10px 10px at 82% 72%, rgba(160,139,255,.20) 0 50%, transparent 52%) no-repeat,
+        radial-gradient(10px 10px at 72% 78%, rgba(160,139,255,.20) 0 50%, transparent 52%) no-repeat;
+      opacity:.45;
+      pointer-events:none;
+      transform: translateY(0);
+      animation: heartsDrift 14s ease-in-out infinite;
     }
-    .card::after { animation-duration: 22s; opacity: .35; }
+    .card::after{
+      animation-duration: 20s;
+      animation-delay: -4s;
+      opacity:.35;
+    }
     @keyframes heartsDrift {
-      0% { transform: translateY(0) }
-      50%{ transform: translateY(-8px) }
-      100%{ transform: translateY(0) }
+      0% { transform: translateY(0); }
+      50%{ transform: translateY(-8px); }
+      100%{ transform: translateY(0); }
     }
 
-    .inner { position: relative; padding: clamp(22px, 3.8vw, 36px); z-index: 1; }
-
-    /* Envelope topper that opens */
-    .envelope {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 90px;
-      pointer-events: none;
-      overflow: visible;
-    }
-    .flap {
-      position: absolute;
-      left: 50%;
-      top: -62px;
-      width: 180px; height: 120px;
-      transform-origin: 50% 100%;
-      transform: translateX(-50%) rotateX(0deg);
-      border-radius: 12px;
-      background: linear-gradient(180deg, #fff, #fff6fb);
-      border: 1px solid rgba(160,139,255,.18);
-      box-shadow: 0 10px 24px rgba(160,139,255,.16);
-      animation: flapOpen 1.6s cubic-bezier(.2,.7,.2,1) .4s forwards;
-    }
-    .seal {
-      position: absolute;
-      left: 50%; top: 44px;
-      transform: translate(-50%,-50%);
-      width: 48px; height: 48px;
-      background: radial-gradient(circle at 30% 30%, #ffd3e3, #ff9fc2 60%, #ff78a7 100%);
-      border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(255,107,154,.28), 0 1px 0 rgba(255,255,255,.8) inset;
-      display: grid; place-items: center;
-      color: #7a0f35; font-weight: 900; font-size: 12px; letter-spacing: .06em;
-      text-transform: uppercase;
-      animation: sealPulse 2.2s ease-in-out 2 .3s;
-    }
-    @keyframes flapOpen {
-      0% { transform: translateX(-50%) rotateX(0deg) }
-      100% { transform: translateX(-50%) rotateX(62deg) }
-    }
-    @keyframes sealPulse {
-      0%,100% { transform: translate(-50%,-50%) scale(1); }
-      50%     { transform: translate(-50%,-50%) scale(1.08); }
+    .inner{
+      position:relative;
+      padding: clamp(22px, 3.8vw, 34px);
+      z-index: 1;
     }
 
-    .badge {
-      display: inline-flex; align-items: center; gap: .5ch;
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:.5ch;
       padding: 8px 12px;
       border-radius: 999px;
       background: linear-gradient(180deg, #fff, #fff5fa);
       border: 1px solid rgba(255,107,154,.22);
       color: var(--accent);
-      font-weight: 700; font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
-      box-shadow: 0 1px 0 rgba(255,255,255,.85) inset, 0 8px 20px rgba(255,107,154,.12);
-      width: max-content;
-      animation: badgeTwinkle 4s ease-in-out infinite;
-    }
-    @keyframes badgeTwinkle {
-      0%, 100% { filter: brightness(1); transform: translateY(0); }
-      50% { filter: brightness(1.06); transform: translateY(-1px); }
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 8px 20px rgba(255,107,154,.12);
+      width:max-content;
     }
 
-    h1 {
-      margin: 14px 0 8px;
-      font-size: clamp(28px, 4.8vw, 46px);
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(28px, 4.8vw, 44px);
       line-height: 1.08;
       letter-spacing: -0.02em;
     }
-    .meow {
+    .meow{
       font-size: clamp(14px, 2.6vw, 18px);
       color: var(--ink-soft);
       margin: 0 0 10px;
     }
 
-    /* Letter area with typewriter */
-    .letter {
-      position: relative;
+    .letter{
       margin: 16px 0 8px;
-      font-size: clamp(16px, 2.7vw, 19px);
-      line-height: 1.68;
+      font-size: clamp(16px, 2.7vw, 18px);
+      line-height: 1.6;
       color: #2b2b2b;
       background: linear-gradient(180deg, #fff, #fff9fc);
-      padding: clamp(16px, 2.2vw, 20px) clamp(18px, 2.6vw, 24px);
+      padding: clamp(14px, 2.2vw, 18px) clamp(16px, 2.6vw, 22px);
       border-radius: var(--radius-lg);
       border: 1px solid rgba(255,107,154,.14);
       box-shadow: var(--shadow-1);
-      overflow: hidden;
     }
 
-    .typing {
-      min-height: 4lh;
-      position: relative;
-      padding-right: 10px; /* caret space */
-    }
-    .typing.caret::after {
-      content: "";
-      position: absolute;
-      right: 6px; top: 0.42em;
-      width: 2px; height: 1.2em;
-      border-radius: 2px;
-      background: linear-gradient(180deg, var(--accent-600), var(--accent-300));
-      animation: blink .95s steps(1,end) infinite;
-    }
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      50.01%, 100% { opacity: 0; }
-    }
-
-    /* Cute cat sticker bobbing */
-    .sticker {
-      position: absolute;
-      right: 14px; top: -12px;
-      width: 72px; height: 72px;
-      display: grid; place-items: center;
-      transform-origin: 50% 90%;
-      filter: drop-shadow(0 6px 16px rgba(160,139,255,.22));
-      animation: bob 3.6s ease-in-out infinite;
-    }
-    @keyframes bob {
-      0%,100% { transform: translateY(0) rotate(-2deg) }
-      50% { transform: translateY(-6px) rotate(2deg) }
-    }
-
-    /* Play area with buttons */
-    .play-area {
+    .play-area{
       position: relative;
       margin-top: clamp(18px, 3.2vw, 28px);
-      height: clamp(250px, 40vw, 340px);
-      min-height: 260px;
+      height: clamp(240px, 38vw, 320px);
+      min-height: 240px;
       border-radius: var(--radius-lg);
       background: linear-gradient(180deg, #fffefc, #fff7fb);
       border: 1px solid rgba(160,139,255,.18);
@@ -275,118 +178,111 @@
       overflow: hidden;
       isolation: isolate;
     }
-    .play-area::before {
-      content: "";
-      position: absolute; inset: 0;
+
+    /* Subtle pattern */
+    .play-area::before{
+      content:"";
+      position:absolute; inset:0;
       background-image:
-        radial-gradient(circle at 16px 16px, rgba(255,107,154,.10) 2px, transparent 2.5px),
-        radial-gradient(circle at 48px 48px, rgba(160,139,255,.10) 2px, transparent 2.5px);
+        radial-gradient(circle at 16px 16px, rgba(255,107,154,.12) 2px, transparent 2.5px),
+        radial-gradient(circle at 48px 48px, rgba(160,139,255,.12) 2px, transparent 2.5px);
       background-size: 64px 64px;
-      opacity: .45;
-      pointer-events: none;
+      opacity:.5;
+      pointer-events:none;
     }
-    .prompt {
-      position: absolute;
-      top: 20px; left: 22px; right: 22px;
-      display: flex; align-items: center; gap: 10px;
+
+    .prompt{
+      position:absolute;
+      top: 22px; left: 22px; right: 22px;
+      display:flex; align-items:center; gap:10px;
       color: var(--ink-soft);
       font-size: 15px;
     }
-    .prompt .cat { font-size: 22px; filter: drop-shadow(0 1px 0 #fff); }
+    .prompt .cat{
+      font-size: 22px; filter: drop-shadow(0 1px 0 #fff);
+    }
 
-    /* Buttons */
-    .btn {
+    /* Button styles */
+    .btn{
       --bg: #fff;
-      --bg2: #fff8fb;
+      --bg2:#fff8fb;
       --fg: var(--ink);
       --shadow: var(--shadow-1);
-      appearance: none;
-      border: 1px solid rgba(0,0,0,0.05);
+      appearance:none;
+      border:1px solid rgba(0,0,0,0.04);
       border-radius: 999px;
       background: linear-gradient(180deg, var(--bg), var(--bg2));
       color: var(--fg);
-      font-weight: 800;
+      font-weight: 700;
       font-size: 16px;
       letter-spacing: .01em;
       padding: 13px 20px;
-      display: inline-flex; align-items: center; gap: 10px;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
       cursor: pointer;
       box-shadow: var(--shadow);
-      transition: transform .14s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, filter .2s ease;
-      user-select: none;
+      transition: transform .12s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, filter .2s ease;
+      user-select:none;
       -webkit-tap-highlight-color: transparent;
     }
-    .btn:hover { transform: translateY(-1px) scale(1.01); }
-    .btn:active { transform: translateY(1px) scale(.985); }
-    .btn:focus-visible { outline: none; box-shadow: var(--shadow-2), 0 0 0 6px var(--ring); }
+    .btn:active{ transform: translateY(1px) scale(.98); }
+    .btn:focus-visible{
+      outline:none;
+      box-shadow: var(--shadow-2), 0 0 0 6px var(--ring);
+    }
 
-    .btn-primary {
+    .btn-primary{
       --bg: color-mix(in oklab, white 86%, var(--accent) 14%);
       --bg2: color-mix(in oklab, white 82%, var(--accent) 18%);
       --fg: #7a0f35;
       border-color: rgba(255,107,154,.34);
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
     }
-    .btn-primary:hover { filter: brightness(1.03); box-shadow: var(--shadow-2); }
-    /* Ripple sparkle on click */
-    .btn-primary:active::after {
-      content: "";
-      position: absolute; inset: -20%;
-      background: radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(255,107,154,.28), transparent 40%);
-      animation: ripple .6s ease forwards;
-      pointer-events: none;
-    }
-    @keyframes ripple {
-      from { transform: scale(.8); opacity: 1; }
-      to   { transform: scale(1.2); opacity: 0; }
+    .btn-primary:hover{
+      filter: brightness(1.03);
+      box-shadow: var(--shadow-2);
     }
 
-    .btn-ghost {
+    .btn-ghost{
       --bg: color-mix(in oklab, white 92%, var(--lilac) 8%);
       --bg2: color-mix(in oklab, white 88%, var(--lilac) 12%);
       --fg: #3a2b80;
       border-color: rgba(160,139,255,.30);
     }
-    .btn-jelly { animation: jelly .6s ease; }
-    @keyframes jelly {
-      0%,100% { transform: scale(1) }
-      30% { transform: scale(1.07, .95) }
-      60% { transform: scale(.98, 1.02) }
+    .btn-ghost:hover{
+      filter: brightness(1.02);
+      box-shadow: var(--shadow-2);
     }
 
     /* Layout within play-area */
-    .yes-wrap {
-      position: absolute;
-      left: 50%;
+    .yes-wrap{
+      position:absolute;
+      left:50%;
       bottom: 22px;
       transform: translateX(-50%);
-      display: flex; align-items: center; gap: 10px;
-      z-index: 1;
+      display:flex; align-items:center; gap:10px;
     }
 
-    #noBtn {
-      position: absolute;
+    #noBtn{
+      position:absolute;
       top: 70px;
       left: 24px;
       transform: translate3d(0,0,0);
       transition: transform .22s cubic-bezier(.2,.7,.2,1), filter .2s ease;
       z-index: 2;
-      will-change: transform;
     }
 
-    /* Celebration overlay */
-    .celebrate {
-      position: absolute; inset: 0;
-      display: none;
-      pointer-events: none;
-      overflow: hidden;
+    /* Celebration hearts */
+    .celebrate{
+      position:absolute; inset:0;
+      display:none;
+      pointer-events:none;
+      overflow:hidden;
       z-index: 5;
     }
-    .celebrate.active { display: block; }
-    .heart {
-      position: absolute;
+    .celebrate.active{ display:block; }
+    .heart{
+      position:absolute;
       top: 100%;
       font-size: var(--size, 16px);
       color: var(--color, #ff6b9a);
@@ -398,90 +294,39 @@
     }
     @keyframes floatUp {
       10% { opacity: .95; }
-      100% {
+      100%{
         transform: translate(-50%, -120vh) scale(1.1) rotate(var(--rot, 0deg));
         opacity: 0;
       }
     }
 
-    /* Love stamp when accepted */
-    .stamp {
-      position: absolute;
-      left: 22px; bottom: 18px;
-      background: radial-gradient(circle at 30% 30%, #ffd3e3, #ff9fc2 60%, #ff78a7 100%);
-      color: #7a0f35;
-      border: 3px dashed rgba(122,15,53,.6);
-      border-radius: 16px;
-      font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
-      padding: 8px 12px;
-      transform: rotate(-6deg) scale(.4);
-      opacity: 0;
-      filter: drop-shadow(0 6px 16px rgba(255,107,154,.3));
-    }
-    .stamp.pop {
-      animation: stampPop .6s cubic-bezier(.2,.8,.2,1) forwards;
-    }
-    @keyframes stampPop {
-      0%   { transform: rotate(-12deg) scale(.4); opacity: 0; }
-      70%  { transform: rotate(-3deg) scale(1.04); opacity: 1; }
-      100% { transform: rotate(-6deg) scale(1);   opacity: 1; }
+    /* Tiny helper text */
+    .tiny{
+      margin-top: 12px;
+      font-size: 12px;
+      color: #6b6b6b;
+      text-align: center;
     }
 
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      .bg-sparkles, .card::before, .card::after, .shine, .badge, .sticker,
-      .flap, .seal, .celebrate, .btn-jelly, .card:hover { animation: none !important; }
-      .card, .btn, #noBtn { transition: none !important; }
-    }
-
-    .tiny { margin-top: 12px; font-size: 12px; color: #6b6b6b; text-align: center; }
-
-    @media (max-width: 420px) {
-      .yes-wrap { bottom: 16px; }
-      #noBtn { top: 60px; }
-      .stamp { display: none; }
+    @media (max-width: 380px){
+      .yes-wrap{ bottom: 16px; }
+      #noBtn{ top: 60px; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-sparkles" aria-hidden="true"></div>
-
   <main class="wrap">
-    <section class="card" id="card" role="region" aria-label="Love letter">
-      <div class="shine" aria-hidden="true"></div>
-      <div class="envelope" aria-hidden="true">
-        <div class="flap"></div>
-        <div class="seal">LOVE</div>
-      </div>
-
+    <section class="card" role="region" aria-label="Love letter">
       <div class="inner">
         <span class="badge" aria-hidden="true">Meow meow</span>
         <h1>Do you love me? <span aria-hidden="true">💘</span></h1>
-        <p class="meow">Soft purrs, sparkly hearts, and the sweetest question.</p>
+        <p class="meow">I made this tiny letter just for you — soft, sparkly, and full of purrs.</p>
 
         <div class="letter" aria-live="polite">
-          <div class="sticker" aria-hidden="true">
-            <!-- Cute cat hugging heart (inline SVG) -->
-            <svg width="60" height="60" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
-                  <stop offset="0" stop-color="#FFD1E1"/><stop offset="1" stop-color="#FF8DB4"/>
-                </linearGradient>
-              </defs>
-              <!-- Heart -->
-              <path d="M60 96 C40 76,16 64,16 42 a18 18 0 0 1 32 -12 a18 18 0 0 1 56 12 c0 22 -24 34 -44 54z" fill="url(#g1)"/>
-              <!-- Cat head -->
-              <circle cx="58" cy="38" r="18" fill="#fff" stroke="#E6DFFB" stroke-width="3"/>
-              <path d="M46 29 L48 20 L54 26" stroke="#E6DFFB" stroke-width="3" stroke-linecap="round"/>
-              <path d="M70 29 L68 20 L62 26" stroke="#E6DFFB" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="52" cy="38" r="2.5" fill="#2b2b2b"/>
-              <circle cx="64" cy="38" r="2.5" fill="#2b2b2b"/>
-              <path d="M56 44 q4 4 8 0" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round" fill="none"/>
-            </svg>
-          </div>
-
-          <div id="typing" class="typing caret" aria-label="Letter text"></div>
-          <div class="stamp" id="stamp" aria-hidden="true">YES! 💞</div>
+          Dear my favorite human,<br/>
+          Every time I think of you, my heart does a little twirl like a ribbon in the wind.
+          So I have to ask, with the softest paws and the warmest smile…
+          will you be my forever yes? Meow meow. ✨
         </div>
 
         <div class="play-area" id="playArea" aria-describedby="promptText">
@@ -510,63 +355,13 @@
 
   <script>
     // Elements
-    const card = document.getElementById('card');
     const playArea = document.getElementById('playArea');
     const yesBtn   = document.getElementById('yesBtn');
     const noBtn    = document.getElementById('noBtn');
     const celebrate= document.getElementById('celebrate');
-    const typingEl = document.getElementById('typing');
-    const stamp    = document.getElementById('stamp');
 
-    // Initial letter text
-    const letterText = `Dear my favorite human, Every time I think of you, my heart does a little twirl like a ribbon in the wind. So I have to ask, with the softest paws and the warmest smile… will you be my forever yes? Meow meow. ✨`;
-
-    // Accepted text
-    const acceptedText = `Eee! You said YES! My heart is the happiest cupcake in the bakery. I promise warm hugs, silly jokes, and endless meow meows. 💞✨`;
-
-    // Typewriter: word-by-word
-    let typerTimer = null;
-    function typeLetter(text, speed=120, caret=true) {
-      clearInterval(typerTimer);
-      typingEl.textContent = '';
-      if (caret) typingEl.classList.add('caret'); else typingEl.classList.remove('caret');
-
-      const words = text.split(' ');
-      let i = 0;
-
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        typingEl.textContent = text;
-        typingEl.classList.remove('caret');
-        return;
-      }
-
-      typerTimer = setInterval(() => {
-        if (i >= words.length) {
-          clearInterval(typerTimer);
-          typingEl.classList.remove('caret');
-          return;
-        }
-        const span = document.createElement('span');
-        span.textContent = (i > 0 ? ' ' : '') + words[i];
-        // sweet entry animation per word
-        span.style.display = 'inline-block';
-        span.style.opacity = '0';
-        span.style.transform = 'translateY(3px)';
-        span.style.transition = 'opacity .18s ease, transform .18s ease';
-        typingEl.appendChild(span);
-        requestAnimationFrame(() => {
-          span.style.opacity = '1';
-          span.style.transform = 'translateY(0)';
-        });
-        i++;
-      }, speed);
-    }
-
-    // Start initial typing
-    typeLetter(letterText, 120, true);
-
-    // Utility to get a safe random position within play area for the "No" button
-    function randomPosition(btn, container) {
+    // Utility to get a safe random position within play area
+    function randomPosition(btn, container){
       const pad = 8;
       const maxX = Math.max(0, container.clientWidth  - btn.offsetWidth  - pad*2);
       const maxY = Math.max(0, container.clientHeight - btn.offsetHeight - pad*2);
@@ -576,40 +371,40 @@
     }
 
     // Make "No" run away on hover/touch
-    function moveNo() {
+    function moveNo(){
       const { x, y } = randomPosition(noBtn, playArea);
       noBtn.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      noBtn.classList.add('btn-jelly');
-      setTimeout(() => noBtn.classList.remove('btn-jelly'), 300);
     }
 
     // Trigger movement on various pointer interactions
-    ['mouseenter', 'mouseover', 'pointerenter', 'pointerover', 'touchstart'].forEach(ev => {
-      noBtn.addEventListener(ev, moveNo, { passive: true });
+    ['mouseenter','mouseover','pointerenter','pointerover','touchstart'].forEach(ev=>{
+      noBtn.addEventListener(ev, moveNo, { passive:true });
     });
 
-    // Occasional idle roam for the "No" button
-    let roamTimer = setInterval(() => {
+    // Also nudge it occasionally so it feels alive
+    let roamTimer = setInterval(()=>{
+      // Move only if pointer isn't already hovering (cheap check)
       if (!noBtn.matches(':hover')) moveNo();
-    }, 3800);
+    }, 3500);
 
     // Celebration hearts when "Yes" is clicked
-    function popHearts() {
+    function popHearts(){
       celebrate.innerHTML = '';
       celebrate.classList.add('active');
 
-      const colors = ['#ff6b9a', '#ff8fb3', '#a08bff', '#ffc0d9', '#ff7fa8', '#66e3bc'];
-      const count = 34;
-      for (let i = 0; i < count; i++) {
+      const colors = ['#ff6b9a', '#ff8fb3', '#a08bff', '#ffc0d9', '#ff7fa8'];
+      const count = 28;
+      for(let i=0;i<count;i++){
         const span = document.createElement('span');
         span.className = 'heart';
-        span.textContent = Math.random() < .18 ? '💗' : '❤';
-        const left = 6 + Math.random() * 88; // percentage
-        const size = 14 + Math.random() * 22; // px
-        const delay = Math.random() * 650; // ms
-        const dur = 1800 + Math.random() * 1500; // ms
-        const rot = (Math.random() * 60 - 30) + 'deg';
-        const color = colors[(Math.random() * colors.length) | 0];
+        span.textContent = Math.random() < .15 ? '💗' : '❤';
+        // randomize properties via CSS variables
+        const left = 8 + Math.random()*84; // percentage
+        const size = 14 + Math.random()*20; // px
+        const delay = Math.random()*600; // ms
+        const dur = 1800 + Math.random()*1400; // ms
+        const rot = (Math.random()*60 - 30) + 'deg';
+        const color = colors[(Math.random()*colors.length)|0];
 
         span.style.left = left + '%';
         span.style.setProperty('--size', size + 'px');
@@ -619,83 +414,27 @@
         span.style.setProperty('--color', color);
         celebrate.appendChild(span);
       }
+
       // Hide celebration layer after animation
-      setTimeout(() => celebrate.classList.remove('active'), 2800);
+      setTimeout(()=> celebrate.classList.remove('active'), 2600);
     }
 
-    // YES button interactions
-    yesBtn.addEventListener('click', (e) => {
-      // Ripple origin for the button
-      const rect = yesBtn.getBoundingClientRect();
-      yesBtn.style.setProperty('--x', `${e.clientX - rect.left}px`);
-      yesBtn.style.setProperty('--y', `${e.clientY - rect.top}px`);
-
-      // Hearts and stamp
+    yesBtn.addEventListener('click', ()=>{
       popHearts();
-      stamp.classList.remove('pop');
-      // Retype a new sweet message
-      typeLetter(acceptedText, 95, true);
-      // Slight delay then show stamp
-      setTimeout(() => stamp.classList.add('pop'), 220);
+      // Optional: sweet microcopy after click
+      const letter = document.querySelector('.letter');
+      letter.innerHTML = `Eee! You said <strong>YES</strong>! My heart is officially the happiest cupcake in the bakery. 
+      I promise to bring you warm hugs, silly jokes, and endless meow meows. 💞✨`;
     });
 
     // Keep "No" in bounds if window resizes
-    window.addEventListener('resize', () => moveNo(), { passive: true });
+    window.addEventListener('resize', ()=>{
+      // Recalculate by moving again (keeps it safe)
+      moveNo();
+    }, { passive:true });
 
     // Initial playful nudge
     requestAnimationFrame(moveNo);
-
-    // Parallax tilt for the card (subtle)
-    let px = 0, py = 0;
-    card.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width;
-      const y = (e.clientY - r.top) / r.height;
-      const rx = (0.5 - y) * 4; // tilt range
-      const ry = (x - 0.5) * 4;
-      px = ry; py = rx;
-      card.style.transform = `perspective(1000px) rotateX(${py}deg) rotateY(${px}deg)`;
-    });
-    card.addEventListener('pointerleave', () => {
-      card.style.transform = '';
-    });
-
-    // Cute cursor sparkles (lightweight)
-    const sparkleColors = ['#ff6b9a','#a08bff','#66e3bc','#ffa6c5'];
-    let sparkThrottle = 0;
-    card.addEventListener('pointermove', (e) => {
-      const now = performance.now();
-      if (now - sparkThrottle < 60) return;
-      sparkThrottle = now;
-
-      const s = document.createElement('div');
-      const size = 6 + Math.random()*6;
-      s.style.position = 'fixed';
-      s.style.left = (e.clientX - size/2) + 'px';
-      s.style.top  = (e.clientY - size/2) + 'px';
-      s.style.width = s.style.height = size + 'px';
-      s.style.borderRadius = '50%';
-      s.style.pointerEvents = 'none';
-      s.style.background = sparkleColors[(Math.random()*sparkleColors.length)|0];
-      s.style.opacity = '.8';
-      s.style.filter = 'blur(0.5px)';
-      s.style.transition = 'transform .6s ease, opacity .6s ease';
-      document.body.appendChild(s);
-      requestAnimationFrame(() => {
-        s.style.transform = `translate(${(Math.random()*16-8)}px, ${(Math.random()*16-8)}px) scale(0)`;
-        s.style.opacity = '0';
-      });
-      setTimeout(() => s.remove(), 700);
-    }, { passive: true });
-
-    // Accessibility: keyboard users can "chase" No with focus too
-    noBtn.addEventListener('focus', moveNo);
-
-    // If the user taps No (on touch), still move it away quickly
-    noBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      moveNo();
-    });
   </script>
 </body>
 </html>
